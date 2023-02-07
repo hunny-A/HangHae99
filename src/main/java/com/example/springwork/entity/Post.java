@@ -52,4 +52,5 @@ public class Post extends Timestamped {
         this.username = username;
         this.contents = contents;
     }
+
 }

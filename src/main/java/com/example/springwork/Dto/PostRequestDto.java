@@ -15,4 +15,5 @@ public class PostRequestDto {
 
     public PostRequestDto(Post post) {
     }
+
 }
