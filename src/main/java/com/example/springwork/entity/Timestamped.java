@@ -10,14 +10,14 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @Getter
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@MappedSuperclass   // 객체의 입장에서 공통 매핑 정보가 필요할 때
+@EntityListeners(AuditingEntityListener.class)  // JPA Entity에 이벤트가 발생할 때 콜백을 처리하고 코드를 실행하는 방법
 public class Timestamped {
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime modifiedAt;
+    protected LocalDateTime modifiedAt;
 
 }

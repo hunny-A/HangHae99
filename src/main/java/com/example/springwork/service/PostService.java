@@ -2,6 +2,7 @@ package com.example.springwork.service;
 
 
 import com.example.springwork.Dto.PostRequestDto;
+import com.example.springwork.Dto.PostResponseDto;
 import com.example.springwork.entity.Post;
 import com.example.springwork.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,12 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
+
+// 메소드 구현
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    public Thread checkPassword;
 
+    /* 선택 게시글 추가 */
     @Transactional
     public Post createPost(PostRequestDto requestDto){
         Post post = new Post(requestDto);   // Post PostrequestDto 생성자 안 만들어줌
@@ -23,27 +29,42 @@ public class PostService {
         return post;
     }
 
+    /* 전체 게시글 조회 */
     @Transactional(readOnly = true)
     public List<Post> getPosts() {
-        return postRepository.findAllByOrderByModifiedAtDesc();
-        //가장 최근에 등록된 순으로
+        return postRepository.findAllByOrderByModifiedAtDesc(); //가장 최근에 등록된 순으로
     }
 
-    public Long update(Long id, PostRequestDto requestDto) {
+    /* 선택 게시글 조회 */
+    @Transactional(readOnly = true)
+    public Post getPostfindById(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
+        );
+        return post;
+    }
+
+    /* 선택 게시글 수정 */
+    @Transactional
+    public PostResponseDto update(Long id, PostRequestDto requestDto) {
         Post post = postRepository.findById(id).orElseThrow(
                 ()->new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        post.update(requestDto.getTitle(), requestDto.getUsername(), requestDto.getContents());
-        return id;
+        if(requestDto.getPassword().equals(post.getPassword())) {
+            post.update(requestDto);
+        }
+        return new PostResponseDto(post);
     }
 
-
-    public PostRequestDto findById(Long id){
+    /* 선택 게시글 삭제 */
+    @Transactional
+    public PostRequestDto delete(Long id, PostRequestDto requestDto) {
         Post post = postRepository.findById(id).orElseThrow(
-                ()->new IllegalArgumentException("해당 게시글이 없습니다. id ="+id)
+                () -> new IllegalArgumentException("아이디가 존재하지 않습니다.")
         );
-        return new PostRequestDto(post);
+        if(requestDto.getPassword().equals(post.getPassword())) {
+            postRepository.delete(post);
+        }
+        return requestDto;
     }
-
-
 }
